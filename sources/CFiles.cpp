@@ -85,17 +85,19 @@ void CFiles::getBitmapData(std::wstring filename){
 			bitmapData);
 
 		BYTE* pixels = (BYTE*)bitmapData->Scan0;
-
+		//заполнение временного буффера (а может не надо)
 		memcpy(ImageBuffer[i], pixels, sizeof(BYTE)*4*imgHeight*imgWidth);
 
 		bitmap->UnlockBits(bitmapData);
 	}
 
 	//заполнение структуры
+	//--//выделение памяти
 	_img.data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
 	for(UINT i=0; i<frameCount; i++ ){
 		_img.data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
 	}
+	//--//заполнение
 	for(UINT i=0; i<frameCount; i++ ){
 		memcpy(_img.data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
 	}
@@ -140,6 +142,7 @@ void CFiles::getFileList(std::wstring name){
 	masks.push_back(L"*.bmp");
 	masks.push_back(L"*.png");
 	masks.push_back(L"*.gif");
+	masks.push_back(L"*.tif");
 
 	//Выделение рабочей папки и имени файла
 	std::size_t found = name.find_last_of(L"/\\");

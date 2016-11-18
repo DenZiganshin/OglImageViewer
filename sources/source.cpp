@@ -29,9 +29,10 @@ struct CPoint{
 
 void saveWindowSizeAndPosition(){
 	FILE *f;
-	f = fopen("config.txt", "wt");
 	int posX = glutGet(GLUT_WINDOW_X),
 		posY = glutGet(GLUT_WINDOW_Y);
+	//запись. заменить fopen
+	f = fopen("config.txt", "wt");
 	fprintf(f,"WindowWidth:%d\n",g_wndWidth);
 	fprintf(f,"WindowHeight:%d\n",g_wndHeight);
 	fprintf(f,"initX:%d\n",posX);
