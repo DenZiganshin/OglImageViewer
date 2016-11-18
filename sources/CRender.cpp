@@ -68,9 +68,7 @@ void CRender::SetImg(CImage *img){
 	cleanUp();
 
 	//загрузка
-	_width = img->width;
-	_height = img->height;
-	_frameCount = img->frameCount;
+	_img = img;
 	_frameCurrent = 0;
 	//создание текстур
 	makeTexture(img->data);

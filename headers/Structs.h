@@ -28,6 +28,7 @@ struct CImage{
 	BYTE **data;
 	UINT width,height;
 	UINT frameCount;
+	std::wstring fileName;
 	CImage(){
 		data = NULL;
 		width = 0; height = 0;
@@ -37,6 +38,15 @@ struct CImage{
 		frameCount = 0;
 		height = 0;
 		width = 0;
+		if(data == NULL)
+			return;
+		for(UINT i=0; i<frameCount; i++){
+			free(data[i]);
+		}
+		free(data);
+		data = NULL;
+	}
+	void freeData(){
 		if(data == NULL)
 			return;
 		for(UINT i=0; i<frameCount; i++){
