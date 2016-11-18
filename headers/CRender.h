@@ -2,6 +2,8 @@
 #define CRENDERH
 
 #include <gl/glut.h>
+#include <algorithm>
+#include <string>
 #include "Structs.h"
 
 
@@ -16,6 +18,9 @@ class CRender{
 	UINT _frameCount, _frameCurrent;
 	GLuint *_texturesId;
 	long _delay;
+	void* _font;
+
+	std::string *_fileName;
 public:
 	CRender();
 	void resizeWnd(UINT WindowWidth, UINT WindowHeight);
@@ -34,6 +39,7 @@ private:
 	void centerImage();
 	void resetValues();
 	void resetTransform();
+	void drawName();
 };
 
 

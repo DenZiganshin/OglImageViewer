@@ -17,7 +17,7 @@
 */
 
 class CFiles{
-CImage _img;
+CImage *_img;
 GLuint _textureId;
 std::wstring _folderPath;
 std::vector<std::wstring> _filesList;
@@ -25,7 +25,7 @@ UINT _positionInList;
 public:
 	CFiles(){
 		_textureId = 0;
-		//getFileList();
+		_img = NULL;
 	}
 	int loadFile(std::wstring);
 	void loadNext();
@@ -34,7 +34,6 @@ public:
 private:
 	void getBitmapData(std::wstring filename);
 	void getFileList(std::wstring name);
-	void cleanUpImg();
 };
 
 #endif

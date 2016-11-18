@@ -92,18 +92,27 @@ void CFiles::getBitmapData(std::wstring filename){
 	}
 
 	//заполнение структуры
+	//--//очистка
+	if(_img != NULL){
+		_img->cleanUp();
+		delete _img;
+	}
 	//--//выделение памяти
-	_img.data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
+	//--//--//создание CImage
+	_img = new CImage();
+	//--//--//создание CImage::data
+	_img->data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
 	for(UINT i=0; i<frameCount; i++ ){
-		_img.data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
+		_img->data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
 	}
 	//--//заполнение
 	for(UINT i=0; i<frameCount; i++ ){
-		memcpy(_img.data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
+		memcpy(_img->data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
 	}
-	_img.width = imgWidth;
-	_img.height = imgHeight;
-	_img.frameCount = frameCount;
+	_img->width = imgWidth;
+	_img->height = imgHeight;
+	_img->frameCount = frameCount;
+	_img->fileName = filename;
 
 
 	/*
@@ -226,9 +235,5 @@ int CFiles::loadFile(std::wstring name){
 
 
 CImage* CFiles::getImage(){
-	return &_img;
-}
-
-void CFiles::cleanUpImg(){
-	_img.cleanUp();
+	return _img;
 }

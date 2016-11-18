@@ -4,13 +4,16 @@
 CRender::CRender(){
 	resetValues();
 	resetTransform();
+	_fileName = NULL;
 }
 
 void CRender::Draw(){
+	//установка состояний
 	glEnable(GL_TEXTURE_2D); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
+	//запись матрицы просмотра
 	glPushMatrix();
 	//трансформации
 	glTranslatef(	(float)_imgZoomShift.x + _imgShift.x + _imgMove.x + _imgCenter.x, 
@@ -22,20 +25,26 @@ void CRender::Draw(){
 
 	// вывод текстуры на прямоугольнике
 	glBegin(GL_QUADS);
-	  glVertex2f(0,				(float)_height); //1
-						glTexCoord2f(1.0f,	1.0f);
-	  glVertex2f((float)_width,	(float)_height); //2
-						glTexCoord2f(1.0f,	0.0f);
-	  glVertex2f((float)_width,	0); //3
-						glTexCoord2f(0.0f,	0.0f);
-	  glVertex2f(0,				0); //4 
-						glTexCoord2f(0.0f,	1.0f);
-	glEnd();
-	
-	
-	nextFrame();
+	  glVertex2f(0,(float)_height); //1
+	  glTexCoord2f(1.0f,	1.0f);
 
+	  glVertex2f((float)_width,(float)_height); //2
+	  glTexCoord2f(1.0f,	0.0f);
+
+	  glVertex2f((float)_width,	0); //3
+	  glTexCoord2f(0.0f,	0.0f);
+
+	  glVertex2f(0, 0); //4 
+	  glTexCoord2f(0.0f,	1.0f);
+	glEnd();	
+
+	//переключение на след кадр
+	nextFrame();
+	//восстановление матрицы просмотра
 	glPopMatrix();
+
+	//вывод имени файла
+	drawName();
 }
 
 void CRender::nextFrame(){
@@ -72,6 +81,9 @@ void CRender::SetImg(CImage *img){
 	_height = img->height;
 	_frameCount = img->frameCount;
 	_frameCurrent = 0;
+	//--//имя файла
+	_fileName = new std::string(img->fileName.begin(),img->fileName.end());
+	
 	//создание текстур
 	makeTexture(img->data);
 
@@ -148,8 +160,11 @@ void CRender::cleanUp(){
 
 	//сброс сдвигов
 	resetTransform();
-
+	//восстановление значений
 	resetValues();
+	//удаление имени файла
+	if(_fileName)
+		delete _fileName;
 }
 
 void CRender::resetValues(){
@@ -161,6 +176,7 @@ void CRender::resetValues(){
 	_frameCurrent = 0;
 	_delay = 42; //24 fps
 	_isImgMoving = false;
+	_font = GLUT_BITMAP_TIMES_ROMAN_24;
 }
 void CRender::resizeWnd(UINT WindowWidth, UINT WindowHeight){
 	_WindowHeight = WindowHeight;
@@ -177,4 +193,11 @@ void CRender::centerImage(){
 void CRender::clearTransforms(){
 	resetTransform();
 	centerImage();
+}
+
+void CRender::drawName(){
+	glRasterPos2f(0.0f, 24.0f); // 24 - font height
+	for(UINT i=0; i<_fileName->length(); i++){
+		glutBitmapCharacter(_font, _fileName->c_str()[i]);
+	}
 }

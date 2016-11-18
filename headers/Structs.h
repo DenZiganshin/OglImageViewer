@@ -2,6 +2,7 @@
 #define STRUCTSH
 
 #include <gl/glut.h>
+#include <string>
 
 struct CShift{
 	float x ,y;
@@ -28,6 +29,7 @@ struct CImage{
 	BYTE **data;
 	UINT width,height;
 	UINT frameCount;
+	std::wstring fileName;
 	CImage(){
 		data = NULL;
 		width = 0; height = 0;
