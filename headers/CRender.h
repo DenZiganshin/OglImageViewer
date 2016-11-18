@@ -16,7 +16,8 @@ class CRender{
 	UINT /*_frameCount,*/ _frameCurrent; //количество кадров, текущий кадр
 	GLuint *_texturesId; //массив индексов созданных текстур
 	long _delay; //пауза между сменами кадров
-	std::wstring fileName;
+	
+	int _textFont;
 public:
 	CRender();
 	void resizeWnd(UINT WindowWidth, UINT WindowHeight);
@@ -35,6 +36,7 @@ private:
 	void centerImage();
 	void resetValues();
 	void resetTransform();
+	void drawName();
 };
 
 

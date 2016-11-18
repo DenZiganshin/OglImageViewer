@@ -92,18 +92,21 @@ void CFiles::getBitmapData(std::wstring filename){
 	}
 
 	//заполнение структуры
-	//--//выделение пам€ти
-	_img.data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
+	//--//создание структуры
+	_img = new CImage();
+	//--//выделение пам€ти data
+	_img->data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
 	for(UINT i=0; i<frameCount; i++ ){
-		_img.data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
+		_img->data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
 	}
 	//--//заполнение
 	for(UINT i=0; i<frameCount; i++ ){
-		memcpy(_img.data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
+		memcpy(_img->data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
 	}
-	_img.width = imgWidth;
-	_img.height = imgHeight;
-	_img.frameCount = frameCount;
+	_img->width = imgWidth;
+	_img->height = imgHeight;
+	_img->frameCount = frameCount;
+	_img->fileName = filename;
 
 
 	/*
@@ -226,9 +229,5 @@ int CFiles::loadFile(std::wstring name){
 
 
 CImage* CFiles::getImage(){
-	return &_img;
-}
-
-void CFiles::cleanUpImg(){
-	_img.cleanUp();
+	return _img;
 }

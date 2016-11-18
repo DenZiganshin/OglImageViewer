@@ -38,13 +38,7 @@ struct CImage{
 		frameCount = 0;
 		height = 0;
 		width = 0;
-		if(data == NULL)
-			return;
-		for(UINT i=0; i<frameCount; i++){
-			free(data[i]);
-		}
-		free(data);
-		data = NULL;
+		freeData();
 	}
 	void freeData(){
 		if(data == NULL)
