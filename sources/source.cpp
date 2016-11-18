@@ -27,6 +27,8 @@ struct CPoint{
 }g_mouseOrig;
 
 
+void glRender(void);
+
 void saveWindowSizeAndPosition(){
 	FILE *f;
 	int posX = glutGet(GLUT_WINDOW_X),
@@ -82,6 +84,7 @@ void loadWndConfig(){
 }
 void glMouseMotionFunc(int x, int y){
 	if(g_MouseLeftDown){
+		//сдвиг изображения относительно точки нажатия
 		g_render.MoveStart(x - g_mouseOrig.x, y - g_mouseOrig.y);
 	}
 }

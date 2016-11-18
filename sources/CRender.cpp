@@ -12,28 +12,16 @@ void CRender::Draw(){
 	glEnable(GL_BLEND);
 
 	glPushMatrix();
+	//трансформации
 	glTranslatef(	(float)_imgZoomShift.x + _imgShift.x + _imgMove.x + _imgCenter.x, 
 					(float)_imgZoomShift.y + _imgShift.y + _imgMove.y + _imgCenter.y, 0);
 	glScalef(_imgZoom,_imgZoom, 1);
 
-	
-	//glColor3f(0.0f, 0.0f, 0.0f);
-	
+	//привязка нужной текстуры
 	glBindTexture(GL_TEXTURE_2D, _texturesId[_frameCurrent]);
-	//glTranslatef((float)-4.0f, (float)-4.0f, 0);
+
+	// вывод текстуры на прямоугольнике
 	glBegin(GL_QUADS);
-	/*
-	  glVertex2f(0,				(float)_height); //1
-						glTexCoord2f(1.0f,	0.0f);
-	  glVertex2f((float)_width,	(float)_height); //2
-						glTexCoord2f(1.0f,	1.0f);
-	  glVertex2f((float)_width,	0); //3
-						glTexCoord2f(0.0f,	1.0f);
-	  glVertex2f(0,				0); //4 
-						glTexCoord2f(0.0f,	0.0f);
-	*/
-
-
 	  glVertex2f(0,				(float)_height); //1
 						glTexCoord2f(1.0f,	1.0f);
 	  glVertex2f((float)_width,	(float)_height); //2
@@ -45,15 +33,14 @@ void CRender::Draw(){
 	glEnd();
 	
 	
-
-	
 	nextFrame();
 
 	glPopMatrix();
 }
 
 void CRender::nextFrame(){
-	if(_frameCount == 1)
+	//изображение из одного кадра или изображение перемещается
+	if( (_frameCount == 1) || (_isImgMoving) )
 		return;
 	_frameCurrent++;
 	if(_frameCurrent >= _frameCount){
@@ -93,6 +80,13 @@ void CRender::SetImg(CImage *img){
 }
 
 void CRender::mainLoopDelay(){
+	//плавное перемещение изображения
+	if(_isImgMoving){
+		Sleep(33); //~30 fps
+		return;
+	}
+
+	//сорость обновления на основе количества кадров
 	if(_frameCount == 1){
 		Sleep(100);
 	}else{
