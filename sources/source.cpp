@@ -5,6 +5,7 @@
 
 #include "../headers/CFiles.h"
 #include "../headers/CRender.h"
+#include "../headers/CWindow.h"
 
 #pragma comment(lib,"Gdiplus.lib")
 #pragma comment(lib,"freeglut.lib")
@@ -15,6 +16,7 @@
 
 CFiles g_files;
 CRender g_render;
+CWindow g_window;
 
 UINT	g_wndWidth = 600,
 		g_wndHeight = 400,
@@ -88,7 +90,17 @@ void glMouseMotionFunc(int x, int y){
 		g_render.MoveStart(x - g_mouseOrig.x, y - g_mouseOrig.y);
 	}
 }
-void glKeybFunc(unsigned char key, int x, int y) {
+void callbackKeybFunc(UINT key){
+	switch(key){
+	case VK_LEFT:
+		g_files.loadPrev();
+		g_render.SetImg(g_files.getImage());
+		break;
+	case VK_RIGHT:
+		g_files.loadNext();
+		g_render.SetImg(g_files.getImage());
+		break;
+	}
 }
 void glSpecialKeyFunc(int key, int x, int y){
 	switch(key){
@@ -173,35 +185,18 @@ int wmain(int argc, wchar_t *argv[]) {
 	std::locale current_locale("");
 	std::locale::global(current_locale);
 
-	//Инициализация glut
-	char fakeParam[] = "fake";
-	char *fakeargv[] = { fakeParam, NULL };
-	int fakeargc = 1;
-	glutInit(&fakeargc, fakeargv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-
-	//установка параметров окна
-	loadWndConfig();
-	glutInitWindowPosition(g_initX,g_initY);
-	glutInitWindowSize(g_wndWidth,g_wndHeight);
-	glutCreateWindow("Viewer");
+	//Инициализация окна
+	g_window.initPosition(g_initX, g_initY);
+	g_window.initSize(g_wndWidth, g_wndHeight);
+	g_window.setCallbackKeyboard(callbackKeybFunc);
+	g_window.createWindow(L"ImageViewer");
 
 
 	//Загрузка первого изображения
 	g_files.loadFile(argv[1]);
 	g_render.SetImg(g_files.getImage());
 	
-	//Установка обработчиков
-	glutDisplayFunc(glRender);
-	glutReshapeFunc(glResize);
-	glutMouseFunc(glMouseFunc);
-	glutMotionFunc(glMouseMotionFunc);
-	glutKeyboardFunc(glKeybFunc);
-	glutSpecialFunc(glSpecialKeyFunc);
-	glutIdleFunc(glIdle);
-
-	//Запуск основного цикла
-	glutMainLoop();
-
+	//передача управления
+	g_window.mainCycle();
 	return 0;
 }

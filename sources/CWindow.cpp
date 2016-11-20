@@ -2,6 +2,8 @@
 
 CWindow::CWindow(){
 	//init
+	_hwnd = NULL;
+	_isWindowCreated = false;
 }
 
 //начальное положение
@@ -19,7 +21,7 @@ void CWindow::initSize(int w, int h){
 //создание нового потока и окна
 void CWindow::createWindow(const WCHAR *title){
 	_title.assign(title);
-	CreateThread(NULL, 0, wndThreadFunc, (void*)this , 0, 0);
+	_thrHandle = CreateThread(NULL, 0, wndThreadFunc, (void*)this , 0, 0);
 }
 
 //static функция потока, вызывает функцию класса
@@ -40,6 +42,7 @@ LRESULT CALLBACK CWindow::msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, 
 			PostQuitMessage(0);
 			break; 
 		case WM_KEYDOWN:
+			wnd->keyboardCallback(wParam);
 			break;
 		case WM_KEYUP:
 			break;
@@ -81,19 +84,21 @@ void CWindow::createW32Window(){
 	RegisterClass (&wc);
 
 	//создание окна
-	HWND hwnd = CreateWindow(
-		className,_title.c_str(),WS_BORDER,
+	_hwnd = CreateWindow(
+		className,_title.c_str(),
+		WS_OVERLAPPEDWINDOW,
 		_x,_y,
 		_width,
 		_height,
 		NULL,NULL,hInstance,NULL);
 
 	//передача параметров в msgWindowFunc (SetWindowLongPtr / GetWindowLongPtr)
-	SetWindowLongPtr(hwnd,GWL_USERDATA, (long)this);
+	SetWindowLongPtr(_hwnd,GWL_USERDATA, (long)this);
 
 	//отображение окна
-	ShowWindow(hwnd, SW_SHOWNORMAL);
+	ShowWindow(_hwnd, SW_SHOWNORMAL);
 
+	_isWindowCreated = true;
 
 	//основной цикл окна
 	while(GetMessage(&msg,NULL,0,0)){
@@ -106,7 +111,7 @@ void CWindow::setCallbackIdle(void (*f)(void)){
 	idleCallback = f;
 }
 
-void CWindow::setCallbackKeyboard(void (*f)(int)){
+void CWindow::setCallbackKeyboard(void (*f)(UINT)){
 	keyboardCallback = f;
 }
 
@@ -116,4 +121,9 @@ void CWindow::setCallbackMouse(void (*f)(int, int, int)){
 
 void CWindow::setCallbackResize(void (*f)(int, int)){
 	resizeCallback = f;
+}
+
+void CWindow::mainCycle(){
+	while(!_isWindowCreated); //костыли
+	WaitForSingleObject(_thrHandle, INFINITE);
 }

@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sources\CWindow.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sources\source.cpp"
 				>
 			</File>
@@ -195,6 +199,10 @@
 			</File>
 			<File
 				RelativePath=".\headers\CRender.h"
+				>
+			</File>
+			<File
+				RelativePath=".\headers\CWindow.h"
 				>
 			</File>
 			<File
