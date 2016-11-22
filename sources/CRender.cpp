@@ -44,7 +44,7 @@ void CRender::Draw(){
 	glPopMatrix();
 
 	//вывод имени файла
-	drawName();
+	//drawName();
 }
 
 void CRender::nextFrame(){
@@ -178,11 +178,13 @@ void CRender::resetValues(){
 	_isImgMoving = false;
 	_font = GLUT_BITMAP_TIMES_ROMAN_24;
 }
+
+// вызывается при изменении размеров окна, нужен для центрирования изображения
 void CRender::resizeWnd(UINT WindowWidth, UINT WindowHeight){
 	_WindowHeight = WindowHeight;
 	_WindowWidth = WindowWidth;
 
-	centerImage();
+	//centerImage();
 }
 
 void CRender::centerImage(){

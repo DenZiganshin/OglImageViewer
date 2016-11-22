@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <gl/glut.h>
+#include <io.h>
 #include "Structs.h"
 
 /*

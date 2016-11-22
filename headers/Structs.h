@@ -49,5 +49,9 @@ struct CImage{
 	}
 };
 
+struct CPoint{
+	int x,y;
+};
+
 
 #endif

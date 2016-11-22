@@ -219,6 +219,10 @@ void CFiles::loadPrev(){
 }
 
 int CFiles::loadFile(std::wstring name){
+	//проверка существования файла
+	if(_waccess(name.c_str(), 4) == -1){
+		return 0;
+	}
 
 	//загрузка списка файлов 
 	getFileList(name);
