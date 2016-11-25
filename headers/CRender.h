@@ -26,8 +26,8 @@ public:
 	void resizeWnd(UINT WindowWidth, UINT WindowHeight);
 	void SetImg(CImage *img);	
 	void Draw();
-	void ZoomIn(UINT x, UINT y);
-	void ZoomOut(UINT x, UINT y);
+	void Zoom(UINT x, UINT y, short speed);
+	//void ZoomOut(UINT x, UINT y, int speed);
 	void MoveStart(int x, int y);
 	void MoveEnd();	
 	void mainLoopDelay();
@@ -40,6 +40,9 @@ private:
 	void resetValues();
 	void resetTransform();
 	void drawName();
+
+	float nx,ny;
+	float dx,dy;
 };
 
 

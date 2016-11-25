@@ -5,13 +5,18 @@ CRender::CRender(){
 	resetValues();
 	resetTransform();
 	_fileName = NULL;
+
+	nx = ny = 0;
+	dx = dy = 0;
 }
 
 void CRender::Draw(){
 	//установка состояний
+	
 	glEnable(GL_TEXTURE_2D); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	glColor3f(1.0f,1.0f,1.0f);
 
 	//запись матрицы просмотра
 	glPushMatrix();
@@ -21,9 +26,7 @@ void CRender::Draw(){
 	glScalef(_imgZoom,_imgZoom, 1);
 
 	//привязка нужной текстуры
-	glBindTexture(GL_TEXTURE_2D, _texturesId[_frameCurrent]);
-
-	// вывод текстуры на прямоугольнике
+	glBindTexture(GL_TEXTURE_2D, _texturesId[_frameCurrent]);	
 	glBegin(GL_QUADS);
 	  glVertex2f(0,(float)_height); //1
 	  glTexCoord2f(1.0f,	1.0f);
@@ -38,10 +41,22 @@ void CRender::Draw(){
 	  glTexCoord2f(0.0f,	1.0f);
 	glEnd();	
 
+
 	//переключение на след кадр
 	nextFrame();
 	//восстановление матрицы просмотра
 	glPopMatrix();
+
+
+	glDisable(GL_TEXTURE_2D); 
+	glDisable(GL_BLEND);	
+	glPointSize(3.0f);
+	glBegin(GL_POINTS);
+	  glColor3f(0.0f,1.0f,0.0f);
+	  glVertex2f(nx,ny);
+	  glColor3f(1.0f,0.0f,0.0f);
+	  glVertex2f(nx+dx,ny+dy);
+	glEnd();
 
 	//вывод имени файла
 	//drawName();
@@ -88,7 +103,13 @@ void CRender::SetImg(CImage *img){
 	makeTexture(img->data);
 
 	//установки перед выводом
-	centerImage();
+	//centerImage();
+	/*
+	_imgShift.x = (_WindowWidth - (_width * _imgZoom)) /2;
+	_imgShift.y = (_WindowHeight - (_height * _imgZoom)) /2;
+	*/
+	_imgShift.x = -((float)_width / 2);
+	_imgShift.y = -((float)_height / 2);
 }
 
 void CRender::mainLoopDelay(){
@@ -117,23 +138,38 @@ void CRender::resetTransform(){
 	_imgZoom = 1.0f;
 }
 
-void CRender::ZoomIn(UINT x, UINT y){
+void CRender::Zoom(UINT x, UINT y, short speed){
 	if(_isImgMoving)
 		return;
-	_imgZoom += _dtZoom;
-	_imgZoomShift.x -= ((x-(_imgShift.x+_imgCenter.x))*(1+_dtZoom)) - (x-(_imgShift.x+_imgCenter.x));
-	_imgZoomShift.y -= ((y-(_imgShift.y+_imgCenter.y))*(1+_dtZoom)) - (y-(_imgShift.y+_imgCenter.y));
+	//дельта
+	float dt = _dtZoom * 4 * (speed / WHEEL_DELTA);
+	_imgZoom += dt;
+	if(_imgZoom <= 0)
+		_imgZoom = _dtZoom;
+
+	//координаты с учетом сдвига
+	nx = ((float)x - (float)_WindowWidth/2) - _imgShift.x;
+	ny = ((float)y - (float)_WindowHeight/2) - _imgShift.y;
+	//сдвиг от точки x,y
+	dx = nx * (1+dt) - nx;
+	dy = ny * (1+dt) - ny;
+	//дополнительный сдвиг от zoom
+	_imgZoomShift.x -= dx;
+	_imgZoomShift.y -= dy;
+
 }
 
-void CRender::ZoomOut(UINT x, UINT y){
+/*
+void CRender::ZoomOut(UINT x, UINT y, int speed){
 	if(_isImgMoving)
 		return;
 	if(_imgZoom - _dtZoom < 0)
 		return;
-	_imgZoom -= _dtZoom;
-	_imgZoomShift.x += ((x-(_imgShift.x+_imgCenter.x))*(1+_dtZoom)) - (x-(_imgShift.x+_imgCenter.x));
-	_imgZoomShift.y += ((y-(_imgShift.y+_imgCenter.y))*(1+_dtZoom)) - (y-(_imgShift.y+_imgCenter.y));
+	_imgZoom -= _dtZoom * (speed / WHEEL_DELTA);
+	//_imgZoomShift.x += ((x-(_imgShift.x+_imgCenter.x))*(1+_dtZoom)) - (x-(_imgShift.x+_imgCenter.x));
+	//_imgZoomShift.y += ((y-(_imgShift.y+_imgCenter.y))*(1+_dtZoom)) - (y-(_imgShift.y+_imgCenter.y));
 }
+*/
 
 void CRender::makeTexture(BYTE **data){
 
@@ -188,8 +224,8 @@ void CRender::resizeWnd(UINT WindowWidth, UINT WindowHeight){
 }
 
 void CRender::centerImage(){
-	_imgCenter.x = (_WindowWidth - (_width * _imgZoom)) /2;
-	_imgCenter.y = (_WindowHeight - (_height * _imgZoom)) /2;
+	_imgCenter.x = -((float)_width / 2);
+	_imgCenter.y = -((float)_height / 2);
 }
 
 void CRender::clearTransforms(){

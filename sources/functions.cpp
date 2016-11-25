@@ -32,7 +32,9 @@ void wndKeybFunc(UINT key){
 	}
 }
 
-void wndMouseFunc(int action, int x, int y, int param){
+void wndMouseFunc(int action, int x, int y, short param){
+	x = x<0?0:x;
+	y = y<0?0:y;
 	switch(action){
 		case WM_LBUTTONDOWN:
 			break;
@@ -50,11 +52,7 @@ void wndMouseFunc(int action, int x, int y, int param){
 			break;
 		//события от колеса мыши
 		case WM_MOUSEWHEEL:
-			if(param > 0){
-				g_render.ZoomIn(x,y);
-			}else{
-				g_render.ZoomOut(x,y);
-			}
+			g_render.Zoom(x,y,param);			
 			break;
 		default:
 			break;
@@ -97,8 +95,7 @@ void wndResizeFunc(int w, int h){
 
 	glMatrixMode(GL_MODELVIEW);
 
-	//центрирование на основе новых размеров
-	//g_render.resizeWnd(w, h);
+	g_render.resizeWnd(w, h);
 	//saveWindowSizeAndPosition();
 }
 

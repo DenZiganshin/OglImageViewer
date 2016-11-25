@@ -17,7 +17,7 @@ extern UINT	g_wndWidth,
 namespace Functions{
 	void wndMouseMoveFunc(int x, int y);
 	void wndKeybFunc(UINT key);
-	void wndMouseFunc(int action, int x, int y, int param);
+	void wndMouseFunc(int action, int x, int y, short param);
 	void wndResizeFunc(int w, int h);
 	bool initGl(HWND hwnd, HDC *hdc);
 }

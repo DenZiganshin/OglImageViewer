@@ -101,7 +101,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//main cycle
 	while(true){
 		if (PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
-			if(msg.message == WM_CLOSE){
+			if( (msg.message == WM_CLOSE) ||
+				(msg.message == WM_DESTROY) ||
+				(msg.message == WM_QUIT) ){
 				break;
 			}
 			TranslateMessage(&msg);				
@@ -158,7 +160,11 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 			Functions::wndMouseFunc(WM_LBUTTONUP,LOWORD(lParam), HIWORD(lParam), 0);
 			break;
 		case WM_MOUSEWHEEL:
-			Functions::wndMouseFunc(WM_MOUSEWHEEL, LOWORD(lParam), HIWORD(lParam), HIWORD(wParam));
+			POINT pt;
+			pt.x = LOWORD(lParam);
+			pt.y = HIWORD(lParam);
+			ScreenToClient(hwnd, &pt);
+			Functions::wndMouseFunc(WM_MOUSEWHEEL, pt.x, pt.y,(short) HIWORD(wParam));
 			break;
 		default:                                   
 			return DefWindowProc (hwnd,message,wParam,lParam);
