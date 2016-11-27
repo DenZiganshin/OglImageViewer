@@ -29,6 +29,12 @@ void wndKeybFunc(UINT key){
 		g_files.loadNext();
 		g_render.SetImg(g_files.getImage());
 		break;
+	case 187:
+		g_render.modifySpeed(1);
+		break;
+	case 189:
+		g_render.modifySpeed(-1);
+		break;
 	}
 }
 

@@ -36,7 +36,6 @@ struct CImage{
 		frameCount = 0;
 	}
 	void cleanUp(){
-		frameCount = 0;
 		height = 0;
 		width = 0;
 		if(data == NULL)
@@ -46,6 +45,7 @@ struct CImage{
 		}
 		free(data);
 		data = NULL;
+		frameCount = 0;
 	}
 };
 

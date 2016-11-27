@@ -5,9 +5,9 @@ CRender::CRender(){
 	resetValues();
 	resetTransform();
 	_fileName = NULL;
-
-	nx = ny = 0;
-	dx = dy = 0;
+	_FPS = 10;
+	_currentTime = 0;
+	_prevTime = 0;
 }
 
 void CRender::Draw(){
@@ -47,17 +47,6 @@ void CRender::Draw(){
 	//восстановление матрицы просмотра
 	glPopMatrix();
 
-
-	glDisable(GL_TEXTURE_2D); 
-	glDisable(GL_BLEND);	
-	glPointSize(3.0f);
-	glBegin(GL_POINTS);
-	  glColor3f(0.0f,1.0f,0.0f);
-	  glVertex2f(nx,ny);
-	  glColor3f(1.0f,0.0f,0.0f);
-	  glVertex2f(nx+dx,ny+dy);
-	glEnd();
-
 	//вывод имени файла
 	//drawName();
 }
@@ -66,9 +55,17 @@ void CRender::nextFrame(){
 	//изображение из одного кадра или изображение перемещается
 	if( (_frameCount == 1) || (_isImgMoving) )
 		return;
-	_frameCurrent++;
-	if(_frameCurrent >= _frameCount){
-		_frameCurrent = 0;
+
+	//текущее время
+	_currentTime = timeGetTime();
+	if(_currentTime - _prevTime >= (1000.0f / _FPS)){
+		//переключение кадра
+		_frameCurrent++;
+		if(_frameCurrent >= _frameCount){
+			_frameCurrent = 0;
+		}
+
+		_prevTime = _currentTime;
 	}
 }
 
@@ -102,29 +99,16 @@ void CRender::SetImg(CImage *img){
 	//создание текстур
 	makeTexture(img->data);
 
+
 	//установки перед выводом
 	//centerImage();
-	/*
-	_imgShift.x = (_WindowWidth - (_width * _imgZoom)) /2;
-	_imgShift.y = (_WindowHeight - (_height * _imgZoom)) /2;
-	*/
 	_imgShift.x = -((float)_width / 2);
 	_imgShift.y = -((float)_height / 2);
 }
 
 void CRender::mainLoopDelay(){
 	//плавное перемещение изображения
-	if(_isImgMoving){
-		Sleep(33); //~30 fps
-		return;
-	}
-
-	//сорость обновления на основе количества кадров
-	if(_frameCount == 1){
-		Sleep(100);
-	}else{
-		Sleep( _delay );
-	}
+	Sleep( 16 ); //~60fps
 }
 
 void CRender::resetTransform(){
@@ -148,11 +132,11 @@ void CRender::Zoom(UINT x, UINT y, short speed){
 		_imgZoom = _dtZoom;
 
 	//координаты с учетом сдвига
-	nx = ((float)x - (float)_WindowWidth/2) - _imgShift.x;
-	ny = ((float)y - (float)_WindowHeight/2) - _imgShift.y;
+	float nx = ((float)x - (float)_WindowWidth/2) - _imgShift.x;
+	float ny = ((float)y - (float)_WindowHeight/2) - _imgShift.y;
 	//сдвиг от точки x,y
-	dx = nx * (1+dt) - nx;
-	dy = ny * (1+dt) - ny;
+	float dx = nx * (1+dt) - nx;
+	float dy = ny * (1+dt) - ny;
 	//дополнительный сдвиг от zoom
 	_imgZoomShift.x -= dx;
 	_imgZoomShift.y -= dy;
@@ -238,4 +222,14 @@ void CRender::drawName(){
 	for(UINT i=0; i<_fileName->length(); i++){
 		glutBitmapCharacter(_font, _fileName->c_str()[i]);
 	}
+}
+
+void CRender::initFont(){
+
+}
+
+void CRender::modifySpeed(int count){	
+	_FPS += count;
+	_FPS = _FPS<1 ? 1 : _FPS;
+	_FPS = _FPS>60 ? 60 : _FPS;
 }

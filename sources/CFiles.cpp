@@ -75,6 +75,7 @@ void CFiles::getBitmapData(std::wstring filename){
 	}
 
 
+	BYTE* pixels;
 	//--//проход по всем кадрам
 	for(UINT i=0; i<frameCount; i++){
 		bitmap->SelectActiveFrame(&dimensionIds[0],i);
@@ -84,9 +85,10 @@ void CFiles::getBitmapData(std::wstring filename){
 			PixelFormat32bppARGB,
 			bitmapData);
 
-		BYTE* pixels = (BYTE*)bitmapData->Scan0;
+		pixels = (BYTE*)bitmapData->Scan0;
 		//заполнение временного буффера (а может не надо)
 		memcpy(ImageBuffer[i], pixels, sizeof(BYTE)*4*imgHeight*imgWidth);
+
 
 		bitmap->UnlockBits(bitmapData);
 	}

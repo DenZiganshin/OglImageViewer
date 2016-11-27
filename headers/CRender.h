@@ -1,6 +1,7 @@
 #ifndef CRENDERH
 #define CRENDERH
 
+#include <Windows.h>
 #include <gl/glut.h>
 #include <algorithm>
 #include <string>
@@ -17,8 +18,11 @@ class CRender{
 	float _dtZoom;
 	UINT _frameCount, _frameCurrent;
 	GLuint *_texturesId;
-	long _delay;
+	int _delay;
 	void* _font;
+
+	DWORD _prevTime, _currentTime;
+	int _FPS;
 
 	std::string *_fileName;
 public:
@@ -32,6 +36,7 @@ public:
 	void MoveEnd();	
 	void mainLoopDelay();
 	void clearTransforms();
+	void modifySpeed(int count);
 private:
 	void nextFrame();
 	void makeTexture(BYTE **data);
@@ -40,9 +45,7 @@ private:
 	void resetValues();
 	void resetTransform();
 	void drawName();
-
-	float nx,ny;
-	float dx,dy;
+	void initFont();
 };
 
 
