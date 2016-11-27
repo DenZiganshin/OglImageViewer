@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hInstance = hInstance;         
 	wc.lpszClassName = className;                        
 	wc.lpfnWndProc = msgWindowFunc;                        
-	wc.style=CS_HREDRAW|CS_VREDRAW;                                              
+	wc.style=CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS;                                              
 	wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);       
 	wc.hCursor=LoadCursor(NULL,IDC_ARROW);            
 	wc.lpszMenuName=NULL;                       
@@ -144,6 +144,9 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		case WM_MOVE:
 			break;
 		//сообщения мыши
+		case WM_LBUTTONDBLCLK:
+			Functions::wndMouseFunc(WM_LBUTTONDBLCLK,LOWORD(lParam), HIWORD(lParam), 0);
+			break;
 		case WM_MOUSEMOVE:
 			Functions::wndMouseMoveFunc(LOWORD(lParam), HIWORD(lParam));
 			break;

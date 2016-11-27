@@ -228,8 +228,9 @@ void CRender::initFont(){
 
 }
 
-void CRender::modifySpeed(int count){	
+int CRender::modifySpeed(int count){	
 	_FPS += count;
 	_FPS = _FPS<1 ? 1 : _FPS;
 	_FPS = _FPS>60 ? 60 : _FPS;
+	return _FPS;
 }

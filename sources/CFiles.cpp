@@ -199,8 +199,7 @@ void CFiles::loadNext(){
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
 
 	//отчет о работе
-	std::wcout << L"loading..." <<std::endl;
-	std::wcout << L">" << fullName <<L" ["<< _positionInList <<L"/"<<_filesList.size()<<L"]"<<std::endl;
+	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
 	//загрузка bitmap
 	getBitmapData(fullName);
@@ -213,8 +212,7 @@ void CFiles::loadPrev(){
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
 
 	//отчет о работе
-	std::wcout << L"loading..." <<std::endl;
-	std::wcout << L">" << fullName <<L" ["<< _positionInList <<L"/"<<_filesList.size()<<L"]"<<std::endl;
+	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
 	//загрузка bitmap
 	getBitmapData(fullName);

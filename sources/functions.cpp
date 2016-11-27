@@ -2,6 +2,7 @@
 #include <gl/glut.h>
 #include <iostream>
 #include <stdio.h>
+#include <fcntl.h>
 
 #include "../headers/globals.h"
 
@@ -30,10 +31,21 @@ void wndKeybFunc(UINT key){
 		g_render.SetImg(g_files.getImage());
 		break;
 	case 187:
-		g_render.modifySpeed(1);
+		wprintf(L"FPS:%d\n",g_render.modifySpeed(1));
 		break;
 	case 189:
-		g_render.modifySpeed(-1);
+		wprintf(L"FPS:%d\n",g_render.modifySpeed(-1));
+		break;
+	case 67: //C key
+		//show console
+		AllocConsole();
+		//redirecting stdout
+		HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+		int hConHandle = _open_osfhandle((long)handle_out, _O_WTEXT);
+		FILE *fp = _wfdopen( hConHandle, L"w");
+		*stdout = *fp;
+		_setmode(_fileno(stdout), _O_U8TEXT);
+
 		break;
 	}
 }
@@ -59,6 +71,15 @@ void wndMouseFunc(int action, int x, int y, short param){
 		//события от колеса мыши
 		case WM_MOUSEWHEEL:
 			g_render.Zoom(x,y,param);			
+			break;
+		case WM_LBUTTONDBLCLK:
+			if( x > g_wndWidth/2){
+				g_files.loadNext();
+				g_render.SetImg(g_files.getImage());
+			}else{
+				g_files.loadPrev();
+				g_render.SetImg(g_files.getImage());
+			}
 			break;
 		default:
 			break;
