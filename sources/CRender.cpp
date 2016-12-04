@@ -103,10 +103,10 @@ void CRender::SetImg(CImage *img){
 	//установки перед выводом
 	//--//масштабирование
 	if(_width*_imgZoom > _WindowWidth){
-		_imgZoom -= 1.0f - ((float)_WindowWidth / _width);
+		_imgZoom -= 1.0f - ((float)_WindowWidth / (_width*_imgZoom));
 	}
 	if(_height*_imgZoom > _WindowHeight){ 
-		_imgZoom -= 1.0f - ((float)_WindowHeight / _height);
+		_imgZoom -= 1.0f - ((float)_WindowHeight / (_height*_imgZoom));
 	}
 
 	//--//центрирование
