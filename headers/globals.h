@@ -21,10 +21,9 @@ namespace Functions{
 	void wndMouseMoveFunc(UINT x, UINT y);
 	void wndKeybFunc(UINT key);
 	void wndMouseFunc(UINT action, UINT x, UINT y, short param);
-	void wndResizeFunc(UINT w, UINT h);
+	void wndPosChangedFunc(WINDOWPOS *p);
 	bool initGl(HWND hwnd, HDC *hdc);
 	void loadWndConfig();
-	void wndMoveFunc(UINT x, UINT y);
 }
 
 #endif

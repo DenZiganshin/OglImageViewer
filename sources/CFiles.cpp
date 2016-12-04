@@ -172,8 +172,8 @@ void CFiles::getFileList(std::wstring name){
 
 		//первый файл по маске
 		HANDLE hFind = FindFirstFile(path.c_str(), &findData);
-		if(!hFind)
-			return;
+		if(hFind == INVALID_HANDLE_VALUE)
+			continue;
 		_filesList.push_back(std::wstring(findData.cFileName));
 
 		//остальные файлы
@@ -191,10 +191,10 @@ void CFiles::getFileList(std::wstring name){
 
 }
 
-void CFiles::loadNext(){
+bool CFiles::loadNext(){
 	//получение следующего имени файла
 	if(_positionInList == _filesList.size()-1) //last file
-		return;
+		return false;
 	_positionInList++;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
 
@@ -203,11 +203,12 @@ void CFiles::loadNext(){
 
 	//загрузка bitmap
 	getBitmapData(fullName);
+	return true;
 }
-void CFiles::loadPrev(){
+bool CFiles::loadPrev(){
 	//получение предыдущего имени файла
 	if(_positionInList == 0) //first file
-		return;
+		return false;
 	_positionInList--;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
 
@@ -216,6 +217,7 @@ void CFiles::loadPrev(){
 
 	//загрузка bitmap
 	getBitmapData(fullName);
+	return true;
 }
 
 int CFiles::loadFile(std::wstring name){

@@ -154,12 +154,12 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		case WM_SIZING: //sizing in progress
 			break;
 		case WM_SIZE: //sized
-			Functions::wndResizeFunc(LOWORD(lParam), HIWORD(lParam));
+			//Functions::wndResizeFunc(LOWORD(lParam), HIWORD(lParam));
 			break;
 		case WM_MOVING:
 			break;
 		case WM_MOVE:
-			Functions::wndMoveFunc(LOWORD(lParam), HIWORD(lParam));
+			//Functions::wndMoveFunc(LOWORD(lParam), HIWORD(lParam));
 			break;
 		//сообщения мыши
 		case WM_LBUTTONDBLCLK:
@@ -167,6 +167,9 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 			break;
 		case WM_MOUSEMOVE:
 			Functions::wndMouseMoveFunc(LOWORD(lParam), HIWORD(lParam));
+			break;
+		case WM_WINDOWPOSCHANGED:
+			Functions::wndPosChangedFunc((WINDOWPOS*)lParam);
 			break;
 		case WM_MOUSELEAVE:
 			break;

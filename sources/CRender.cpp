@@ -5,7 +5,7 @@ CRender::CRender(){
 	resetValues();
 	resetTransform();
 	_fileName = NULL;
-	_FPS = 10;
+	_FPS = 20;
 	_currentTime = 0;
 	_prevTime = 0;
 }
@@ -102,11 +102,15 @@ void CRender::SetImg(CImage *img){
 
 	//установки перед выводом
 	//--//масштабирование
-	if(_width*_imgZoom > _WindowWidth){
-		_imgZoom -= 1.0f - ((float)_WindowWidth / (_width*_imgZoom));
-	}
-	if(_height*_imgZoom > _WindowHeight){ 
-		_imgZoom -= 1.0f - ((float)_WindowHeight / (_height*_imgZoom));
+	if(_WindowWidth > _WindowHeight){
+		if((float)_height*_imgZoom > _WindowHeight){ 
+			_imgZoom -= 1.0f - ((float)_WindowHeight / ((float)_height*_imgZoom));
+		}
+	}else{
+		if((float)_width*_imgZoom > _WindowWidth){
+			_imgZoom -= 1.0f - ((float)_WindowWidth / ((float)_width*_imgZoom));
+		}
+		
 	}
 
 	//--//центрирование

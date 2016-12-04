@@ -12,6 +12,9 @@ CPoint mouseOrig;
 bool isMouseLeftDown = false;
 
 bool isConsole = false;
+FILE *_stdoutFile = NULL;
+int _stdoutHandle = 0;
+FILE _oldStdOut = *stdout;
 
 
 void toggleConsole(){
@@ -20,9 +23,9 @@ void toggleConsole(){
 		AllocConsole();
 		//redirecting stdout
 		HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
-		int hConHandle = _open_osfhandle((long)handle_out, _O_WTEXT);
-		FILE *fp = _wfdopen( hConHandle, L"w");
-		*stdout = *fp;
+		_stdoutHandle = _open_osfhandle((long)handle_out, _O_WTEXT);
+		_stdoutFile = _wfdopen( _stdoutHandle, L"w");
+		*stdout = *_stdoutFile;
 		_setmode(_fileno(stdout), _O_U8TEXT);
 
 		isConsole = true;
@@ -45,12 +48,12 @@ void wndMouseMoveFunc(UINT x, UINT y){
 void wndKeybFunc(UINT key){
 	switch(key){
 	case VK_LEFT:
-		g_files.loadPrev();
-		g_render.SetImg(g_files.getImage());
+		if(g_files.loadPrev())
+			g_render.SetImg(g_files.getImage());
 		break;
 	case VK_RIGHT:
-		g_files.loadNext();
-		g_render.SetImg(g_files.getImage());
+		if(g_files.loadNext())
+			g_render.SetImg(g_files.getImage());
 		break;
 	case 187:
 		wprintf(L"FPS:%d\n",g_render.modifySpeed(1));
@@ -69,8 +72,13 @@ void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 	y = y<0?0:y;
 	switch(action){
 		case WM_LBUTTONDOWN:
+			mouseOrig.x = x;
+			mouseOrig.y = y;
+			isMouseLeftDown = true;
 			break;
 		case WM_LBUTTONUP:
+			isMouseLeftDown = false;
+			g_render.MoveEnd();
 			break;
 		//перемещение изображения (up/down)
 		case WM_RBUTTONDOWN:
@@ -120,7 +128,7 @@ void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 
 void saveWindowSizeAndPosition();
 
-void wndResizeFunc(UINT w, UINT h){
+void resizeWindow(UINT w, UINT h){
 	//вычисление положения рабочей области
 	/*
 	RECT cr,wr;
@@ -147,6 +155,11 @@ void wndResizeFunc(UINT w, UINT h){
 	g_render.resizeWnd(w, h);
 	saveWindowSizeAndPosition();
 }
+void wndPosChangedFunc(WINDOWPOS *p){
+	g_initX = p->x;
+	g_initY = p->y;
+	resizeWindow(p->cx, p->cy);
+}
 
 void saveWindowSizeAndPosition(){
 	
@@ -159,11 +172,6 @@ void saveWindowSizeAndPosition(){
 	fs << "initX: " << g_initX << std::endl;
 	fs << "initY: " << g_initY << std::endl;
 	fs.close();
-}
-
-void wndMoveFunc(UINT x, UINT y){
-	g_initX = x;
-	g_initY = y;
 }
 
 void loadWndConfig(){

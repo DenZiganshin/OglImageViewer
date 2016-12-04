@@ -29,8 +29,8 @@ public:
 		_img = NULL;
 	}
 	int loadFile(std::wstring);
-	void loadNext();
-	void loadPrev();
+	bool loadNext();
+	bool loadPrev();
 	CImage* getImage();
 private:
 	void getBitmapData(std::wstring filename);
