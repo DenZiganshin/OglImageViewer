@@ -101,9 +101,18 @@ void CRender::SetImg(CImage *img){
 
 
 	//установки перед выводом
-	//centerImage();
-	_imgShift.x = -((float)_width / 2);
-	_imgShift.y = -((float)_height / 2);
+	//--//масштабирование
+	if(_width*_imgZoom > _WindowWidth){
+		_imgZoom -= 1.0f - ((float)_WindowWidth / _width);
+	}
+	if(_height*_imgZoom > _WindowHeight){ 
+		_imgZoom -= 1.0f - ((float)_WindowHeight / _height);
+	}
+
+	//--//центрирование
+	_imgShift.x = -((float)_width*_imgZoom / 2);
+	_imgShift.y = -((float)_height*_imgZoom / 2);
+
 }
 
 void CRender::mainLoopDelay(){

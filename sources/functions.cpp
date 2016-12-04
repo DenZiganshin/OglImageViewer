@@ -11,8 +11,30 @@ namespace Functions{
 CPoint mouseOrig;
 bool isMouseLeftDown = false;
 
+bool isConsole = false;
 
-void wndMouseMoveFunc(int x, int y){
+
+void toggleConsole(){
+	if(!isConsole){
+		//show console
+		AllocConsole();
+		//redirecting stdout
+		HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
+		int hConHandle = _open_osfhandle((long)handle_out, _O_WTEXT);
+		FILE *fp = _wfdopen( hConHandle, L"w");
+		*stdout = *fp;
+		_setmode(_fileno(stdout), _O_U8TEXT);
+
+		isConsole = true;
+	}else{
+		FreeConsole();
+
+		isConsole = false;
+	}
+}
+
+
+void wndMouseMoveFunc(UINT x, UINT y){
 	if(Functions::isMouseLeftDown){
 		//сдвиг изображения относительно точки нажатия
 		g_render.MoveStart(	x - mouseOrig.x, 
@@ -37,20 +59,12 @@ void wndKeybFunc(UINT key){
 		wprintf(L"FPS:%d\n",g_render.modifySpeed(-1));
 		break;
 	case 67: //C key
-		//show console
-		AllocConsole();
-		//redirecting stdout
-		HANDLE handle_out = GetStdHandle(STD_OUTPUT_HANDLE);
-		int hConHandle = _open_osfhandle((long)handle_out, _O_WTEXT);
-		FILE *fp = _wfdopen( hConHandle, L"w");
-		*stdout = *fp;
-		_setmode(_fileno(stdout), _O_U8TEXT);
-
+		toggleConsole();
 		break;
 	}
 }
 
-void wndMouseFunc(int action, int x, int y, short param){
+void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 	x = x<0?0:x;
 	y = y<0?0:y;
 	switch(action){
@@ -71,6 +85,12 @@ void wndMouseFunc(int action, int x, int y, short param){
 		//события от колеса мыши
 		case WM_MOUSEWHEEL:
 			g_render.Zoom(x,y,param);			
+			break;
+		case WM_MOUSELEAVE:
+			if(isMouseLeftDown){
+				isMouseLeftDown = false;
+				g_render.MoveEnd();
+			}
 			break;
 		case WM_LBUTTONDBLCLK:
 			if( x > g_wndWidth/2){
@@ -98,7 +118,9 @@ void wndMouseFunc(int action, int x, int y, short param){
 	*/
 }
 
-void wndResizeFunc(int w, int h){
+void saveWindowSizeAndPosition();
+
+void wndResizeFunc(UINT w, UINT h){
 	//вычисление положения рабочей области
 	/*
 	RECT cr,wr;
@@ -116,68 +138,67 @@ void wndResizeFunc(int w, int h){
 	glLoadIdentity();
 
 	glViewport(0, 0, w, h); 
-	glOrtho(-w/2,w/2,h/2,-h/2, -1, 1); 
+	glOrtho(-(int)(w/2),w/2,h/2,-(int)(h/2), -1, 1); 
 	g_wndWidth = w;
 	g_wndHeight = h;
 
 	glMatrixMode(GL_MODELVIEW);
 
 	g_render.resizeWnd(w, h);
-	//saveWindowSizeAndPosition();
+	saveWindowSizeAndPosition();
 }
 
 void saveWindowSizeAndPosition(){
-	FILE *f;
-	int posX = glutGet(GLUT_WINDOW_X),
-		posY = glutGet(GLUT_WINDOW_Y);
-	//запись. заменить fopen
-	f = fopen("config.txt", "wt");
-	fprintf(f,"WindowWidth:%d\n",g_wndWidth);
-	fprintf(f,"WindowHeight:%d\n",g_wndHeight);
-	fprintf(f,"initX:%d\n",posX);
-	fprintf(f,"initY:%d\n",posY);
-	fclose(f);
+	
+	std::wstring name = g_path + L"config.txt";
+	std::fstream fs;
+
+	fs.open(name.c_str(), std::fstream::out);
+	fs << "WindowWidth: " << g_wndWidth << std::endl;
+	fs << "WindowHeight: " << g_wndHeight << std::endl;
+	fs << "initX: " << g_initX << std::endl;
+	fs << "initY: " << g_initY << std::endl;
+	fs.close();
 }
-std::string readLine(FILE *f){
-	char ch;
-	std::string st = "";
-	while((ch = fgetc(f)) != '\n'){
-		st += ch;
-	}
-	return st;
+
+void wndMoveFunc(UINT x, UINT y){
+	g_initX = x;
+	g_initY = y;
 }
+
 void loadWndConfig(){
-	FILE *f = NULL;
-	f = fopen("config.txt", "rt");
-	if(f == NULL)
+	std::wstring name = g_path + L"config.txt";
+
+	//проверка существования файла
+	if(_waccess(g_path.c_str(), 4) == -1){
 		return;
-	//ищем 4 параметра в любом порядке
+	}
+
+	//загрузка
+	std::fstream fs;
+
+	std::string param;
+
+	fs.open(name.c_str(), std::fstream::in);
+
 	for(int i=0; i<4; i++){
-		int find;
-		// читаем строку до \n
-		std::string s = readLine(f);
-		//поиск совпадений
-		if((find = s.find("WindowWidth:")) != std::string::npos){
-			std::string subs = s.substr(find + strlen("WindowWidth:"), s.length());
-			g_wndWidth = atoi(subs.c_str());
-			continue;
+		fs >> param;
+
+		if(param == "WindowWidth:"){
+			fs >> g_wndWidth;
 		}
-		if((find = s.find("WindowHeight:")) != std::string::npos){
-			std::string subs = s.substr(find + strlen("WindowHeight:"), s.length());
-			g_wndHeight = atoi(subs.c_str());
-			continue;
+		if(param == "WindowHeight:"){
+			fs >> g_wndHeight;
 		}
-		if((find = s.find("initX:")) != std::string::npos){
-			std::string subs = s.substr(find + strlen("initX:"), s.length());
-			g_initX = atoi(subs.c_str());
-			continue;
+		if(param == "initX:"){
+			fs >> g_initX;
 		}
-		if((find = s.find("initY:")) != std::string::npos){
-			std::string subs = s.substr(find + strlen("initY:"), s.length());
-			g_initY = atoi(subs.c_str());
-			continue;
+		if(param == "initY:"){
+			fs >> g_initY;
 		}
 	}
+
+	fs.close();
 }
 
 

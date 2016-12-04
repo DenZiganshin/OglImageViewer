@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 
+#include "../resource.h"
 
 #include "../headers/globals.h"
 
@@ -13,6 +14,9 @@ UINT	g_wndWidth,
 		g_wndHeight,
 		g_initX,
 		g_initY;
+
+std::wstring g_path;
+
 
 #pragma comment(lib,"Gdiplus.lib")
 #pragma comment(lib,"freeglut.lib")
@@ -37,6 +41,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	DWORD windowStyle = WS_OVERLAPPEDWINDOW;
 	LPCWSTR className = L"ResultWindow";    
 
+
+	Functions::toggleConsole();
+
 	//установка глобальных переменных
 	initGlobals();
 
@@ -49,6 +56,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	}
 
+	//получение пути до exe
+	g_path.assign(argv[0]);
+	int pos = g_path.find_last_of(L"/\\");
+	g_path = g_path.substr(0, pos+1);
+
 	//заполнение wnd class
 	WNDCLASS wc;                               
 	ZeroMemory(&wc,sizeof(wc));  
@@ -56,7 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.lpszClassName = className;                        
 	wc.lpfnWndProc = msgWindowFunc;                        
 	wc.style=CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS;                                              
-	wc.hIcon=LoadIcon(NULL,IDI_APPLICATION);       
+	wc.hIcon=LoadIcon(hInstance,MAKEINTRESOURCE(IDI_ICON1));       
 	wc.hCursor=LoadCursor(NULL,IDC_ARROW);            
 	wc.lpszMenuName=NULL;                       
 	wc.cbClsExtra=0;                              
@@ -64,12 +76,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if(!RegisterClass (&wc))
 		return 1;
 
+	//загрузка параметров
+	Functions::loadWndConfig();
+
+
 
 	//расчет требуемого размера окна
 	RECT r;
 	r.left = 0; r.top = 0;
 	r.right = g_wndWidth, r.bottom = g_wndHeight;
-	AdjustWindowRect(&r, windowStyle, false);
+	//AdjustWindowRect(&r, windowStyle, false);
+	
 
 	//создание окна
 	HWND hwnd = CreateWindow(
@@ -142,6 +159,7 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		case WM_MOVING:
 			break;
 		case WM_MOVE:
+			Functions::wndMoveFunc(LOWORD(lParam), HIWORD(lParam));
 			break;
 		//сообщения мыши
 		case WM_LBUTTONDBLCLK:
@@ -149,6 +167,8 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 			break;
 		case WM_MOUSEMOVE:
 			Functions::wndMouseMoveFunc(LOWORD(lParam), HIWORD(lParam));
+			break;
+		case WM_MOUSELEAVE:
 			break;
 		case WM_RBUTTONDOWN:
 			Functions::wndMouseFunc(WM_RBUTTONDOWN,LOWORD(lParam), HIWORD(lParam), 0);

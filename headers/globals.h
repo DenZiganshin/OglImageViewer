@@ -14,12 +14,17 @@ extern UINT	g_wndWidth,
 			g_initX,
 			g_initY;
 
+extern std::wstring g_path;
+
 namespace Functions{
-	void wndMouseMoveFunc(int x, int y);
+	void toggleConsole();
+	void wndMouseMoveFunc(UINT x, UINT y);
 	void wndKeybFunc(UINT key);
-	void wndMouseFunc(int action, int x, int y, short param);
-	void wndResizeFunc(int w, int h);
+	void wndMouseFunc(UINT action, UINT x, UINT y, short param);
+	void wndResizeFunc(UINT w, UINT h);
 	bool initGl(HWND hwnd, HDC *hdc);
+	void loadWndConfig();
+	void wndMoveFunc(UINT x, UINT y);
 }
 
 #endif
