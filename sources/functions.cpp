@@ -45,6 +45,18 @@ void wndMouseMoveFunc(UINT x, UINT y){
 	}
 }
 
+
+void saveCurrentScreen(){
+	BYTE *data = NULL;
+	
+	data = (BYTE*)malloc(3 * g_wndWidth * g_wndHeight);
+
+	g_render.saveScreen(data);
+	g_files.saveFile(L"test.png",data,g_wndWidth,g_wndHeight);
+
+	free(data);
+}
+
 void wndKeybFunc(UINT key){
 	switch(key){
 	case VK_LEFT:
@@ -63,6 +75,9 @@ void wndKeybFunc(UINT key){
 		break;
 	case 67: //C key
 		toggleConsole();
+		break;
+	case 80:
+		saveCurrentScreen();
 		break;
 	}
 }

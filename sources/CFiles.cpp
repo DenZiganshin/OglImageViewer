@@ -1,42 +1,39 @@
 #include "../headers/CFiles.h"
 
 
-	//Получение кодировщика для сохранения файла
-	int GetEncoderClsid(const WCHAR* format, CLSID* pClsid){
-		UINT  num = 0;          // number of image encoders
-		UINT  size = 0;         // size of the image encoder array in bytes
+//Получение кодировщика для сохранения файла
+int CFiles::GetEncoderClsid(const WCHAR* format, CLSID* pClsid){
+	UINT  num = 0;          // number of image encoders
+	UINT  size = 0;         // size of the image encoder array in bytes
 
-		using namespace Gdiplus;
+	using namespace Gdiplus;
 
-		ImageCodecInfo* pImageCodecInfo = NULL;
+	ImageCodecInfo* pImageCodecInfo = NULL;
 
-		GetImageEncodersSize(&num, &size);
-		if(size == 0)
-		  return -1;  // Failure
+	GetImageEncodersSize(&num, &size);
+	if(size == 0)
+	  return -1;  // Failure
 
-		pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-		if(pImageCodecInfo == NULL)
-		  return -1;  // Failure
+	pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+	if(pImageCodecInfo == NULL)
+	  return -1;  // Failure
 
-		GetImageEncoders(num, size, pImageCodecInfo);
+	GetImageEncoders(num, size, pImageCodecInfo);
 
-		for(UINT j = 0; j < num; ++j)
-		{
-		  if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
-		  {
-			 *pClsid = pImageCodecInfo[j].Clsid;
-			 free(pImageCodecInfo);
-			 return j;  // Success
-		  }
-		}
-
-		free(pImageCodecInfo);
-		return -1;  // Failure
+	for(UINT j = 0; j < num; ++j)
+	{
+	  if( wcscmp(pImageCodecInfo[j].MimeType, format) == 0 )
+	  {
+		 *pClsid = pImageCodecInfo[j].Clsid;
+		 free(pImageCodecInfo);
+		 return j;  // Success
+	  }
 	}
 
+	free(pImageCodecInfo);
+	return -1;  // Failure
+}
 
-
-	
 
 void CFiles::getBitmapData(std::wstring filename){
 	UINT imgWidth,imgHeight,frameCount;
@@ -197,7 +194,11 @@ bool CFiles::loadNext(){
 		return false;
 	_positionInList++;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
-
+	//проверка существования файла
+	if(_waccess(fullName.c_str(), 4) == -1){
+		wprintf(L">%s[%d/%d] - not found\n",fullName.c_str(), _positionInList, _filesList.size()-1);
+		return false;
+	}
 	//отчет о работе
 	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
@@ -211,7 +212,11 @@ bool CFiles::loadPrev(){
 		return false;
 	_positionInList--;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
-
+	//проверка существования файла
+	if(_waccess(fullName.c_str(), 4) == -1){
+		wprintf(L">%s[%d/%d] - not found\n",fullName.c_str(), _positionInList, _filesList.size()-1);
+		return false;
+	}
 	//отчет о работе
 	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
@@ -239,6 +244,31 @@ int CFiles::loadFile(std::wstring name){
 	return 1;
 }
 
+
+
+int CFiles::saveFile(std::wstring name, BYTE *data, int width, int height){
+	//Инициализация GDI+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+
+	
+	// Сохранение нового файла
+	Gdiplus::Bitmap* newBit = new Gdiplus::Bitmap(width, height, width*3, PixelFormat24bppRGB, data);
+	std::cout << "sizes:";
+	std::cout << newBit->GetWidth() << " ";
+	std::cout << newBit->GetHeight() << std::endl;
+	CLSID pngClsid;
+    GetEncoderClsid(L"image/png", &pngClsid);
+	newBit->Save(name.c_str(),&pngClsid, NULL);
+	delete newBit;
+
+	//отключение gdi+
+	Gdiplus::GdiplusShutdown(gdiplusToken);
+
+	return 1;
+}
 
 CImage* CFiles::getImage(){
 	return _img;

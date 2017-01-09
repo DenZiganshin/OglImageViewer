@@ -29,12 +29,14 @@ public:
 		_img = NULL;
 	}
 	int loadFile(std::wstring);
+	int saveFile(std::wstring name, BYTE *data, int width, int height);
 	bool loadNext();
 	bool loadPrev();
 	CImage* getImage();
 private:
 	void getBitmapData(std::wstring filename);
 	void getFileList(std::wstring name);
+	int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 };
 
 #endif

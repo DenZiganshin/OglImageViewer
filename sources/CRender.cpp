@@ -247,3 +247,11 @@ int CRender::modifySpeed(int count){
 	_FPS = _FPS>60 ? 60 : _FPS;
 	return _FPS;
 }
+
+
+void CRender::saveScreen(BYTE *outData){
+	//outData = (BYTE*) malloc(3 * _WindowWidth * _WindowHeight);
+
+	glReadPixels(0, 0, _WindowWidth, _WindowHeight, GL_RGB, GL_UNSIGNED_BYTE, outData);
+
+}

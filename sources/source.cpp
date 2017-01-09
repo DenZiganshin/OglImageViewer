@@ -42,7 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LPCWSTR className = L"ResultWindow";    
 
 
-	Functions::toggleConsole();
+	//Functions::toggleConsole();
 
 	//установка глобальных переменных
 	initGlobals();

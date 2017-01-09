@@ -37,6 +37,7 @@ public:
 	void mainLoopDelay();
 	void clearTransforms();
 	int modifySpeed(int count);
+	void saveScreen(BYTE * outData);
 private:
 	void nextFrame();
 	void makeTexture(BYTE **data);
