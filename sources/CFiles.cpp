@@ -1,7 +1,7 @@
-#include "../headers/CFiles.h"
+п»ї#include "../headers/CFiles.h"
 
 
-//Получение кодировщика для сохранения файла
+//РџРѕР»СѓС‡РµРЅРёРµ РєРѕРґРёСЂРѕРІС‰РёРєР° РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ С„Р°Р№Р»Р°
 int CFiles::GetEncoderClsid(const WCHAR* format, CLSID* pClsid){
 	UINT  num = 0;          // number of image encoders
 	UINT  size = 0;         // size of the image encoder array in bytes
@@ -38,15 +38,15 @@ int CFiles::GetEncoderClsid(const WCHAR* format, CLSID* pClsid){
 void CFiles::getBitmapData(std::wstring filename){
 	UINT imgWidth,imgHeight,frameCount;
 
-	//Инициализация GDI+
+	//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ GDI+
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
-	//Получение имени файла
+	//РџРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С„Р°Р№Р»Р°
 	Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(filename.c_str());
 
-	//Получение количества кадров
+	//РџРѕР»СѓС‡РµРЅРёРµ РєРѕР»РёС‡РµСЃС‚РІР° РєР°РґСЂРѕРІ
 	UINT dimensionCount;
 	GUID *dimensionIds = NULL;
 	dimensionCount = bitmap->GetFrameDimensionsCount();
@@ -54,13 +54,13 @@ void CFiles::getBitmapData(std::wstring filename){
 	bitmap->GetFrameDimensionsList(dimensionIds, dimensionCount);
 	frameCount = bitmap->GetFrameCount( &dimensionIds[0] );
 
-	//Получение задержек между кадрами
+	//РџРѕР»СѓС‡РµРЅРёРµ Р·Р°РґРµСЂР¶РµРє РјРµР¶РґСѓ РєР°РґСЂР°РјРё
 	int sizeOfFrameDelayTag = bitmap->GetPropertyItemSize(PropertyTagFrameDelay);
 	Gdiplus::PropertyItem *propertyItem = (Gdiplus::PropertyItem*) malloc(sizeOfFrameDelayTag);
 	bitmap->GetPropertyItem(PropertyTagFrameDelay, sizeOfFrameDelayTag, propertyItem);
 
 
-	//Чтение bitmapData
+	//Р§С‚РµРЅРёРµ bitmapData
 	Gdiplus::BitmapData* bitmapData = new Gdiplus::BitmapData;
 	imgWidth = bitmap->GetWidth();
 	imgHeight = bitmap->GetHeight();
@@ -73,7 +73,7 @@ void CFiles::getBitmapData(std::wstring filename){
 
 
 	BYTE* pixels;
-	//--//проход по всем кадрам
+	//--//РїСЂРѕС…РѕРґ РїРѕ РІСЃРµРј РєР°РґСЂР°Рј
 	for(UINT i=0; i<frameCount; i++){
 		bitmap->SelectActiveFrame(&dimensionIds[0],i);
 		bitmap->LockBits(
@@ -83,28 +83,28 @@ void CFiles::getBitmapData(std::wstring filename){
 			bitmapData);
 
 		pixels = (BYTE*)bitmapData->Scan0;
-		//заполнение временного буффера (а может не надо)
+		//Р·Р°РїРѕР»РЅРµРЅРёРµ РІСЂРµРјРµРЅРЅРѕРіРѕ Р±СѓС„С„РµСЂР° (Р° РјРѕР¶РµС‚ РЅРµ РЅР°РґРѕ)
 		memcpy(ImageBuffer[i], pixels, sizeof(BYTE)*4*imgHeight*imgWidth);
 
 
 		bitmap->UnlockBits(bitmapData);
 	}
 
-	//заполнение структуры
-	//--//очистка
+	//Р·Р°РїРѕР»РЅРµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹
+	//--//РѕС‡РёСЃС‚РєР°
 	if(_img != NULL){
 		_img->cleanUp();
 		delete _img;
 	}
-	//--//выделение памяти
-	//--//--//создание CImage
+	//--//РІС‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё
+	//--//--//СЃРѕР·РґР°РЅРёРµ CImage
 	_img = new CImage();
-	//--//--//создание CImage::data
+	//--//--//СЃРѕР·РґР°РЅРёРµ CImage::data
 	_img->data = (BYTE**)malloc(sizeof(BYTE*)*frameCount);
 	for(UINT i=0; i<frameCount; i++ ){
 		_img->data[i] = (BYTE*)malloc(sizeof(BYTE)*imgWidth*imgHeight*4);
 	}
-	//--//заполнение
+	//--//Р·Р°РїРѕР»РЅРµРЅРёРµ
 	for(UINT i=0; i<frameCount; i++ ){
 		memcpy(_img->data[i], ImageBuffer[i], sizeof(BYTE)*4*imgHeight*imgWidth);
 	}
@@ -115,7 +115,7 @@ void CFiles::getBitmapData(std::wstring filename){
 
 
 	/*
-	// Сохранение нового файла
+	// РЎРѕС…СЂР°РЅРµРЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
 	Gdiplus::Bitmap* newBit = new Gdiplus::Bitmap(imgWidth, imgHeight*frameCount, imgWidth*4, PixelFormat32bppARGB, oneImageBuffer);
 	std::cout << "sizes:";
 	std::cout << newBit->GetWidth() << " ";
@@ -126,7 +126,7 @@ void CFiles::getBitmapData(std::wstring filename){
 	delete newBit;
 	*/
 
-	//очистка
+	//РѕС‡РёСЃС‚РєР°
 	free(dimensionIds);
 	for(UINT i=0; i<frameCount; i++ ){
 		free(ImageBuffer[i]);
@@ -152,7 +152,7 @@ void CFiles::getFileList(std::wstring name){
 	masks.push_back(L"*.gif");
 	masks.push_back(L"*.tif");
 
-	//Выделение рабочей папки и имени файла
+	//Р’С‹РґРµР»РµРЅРёРµ СЂР°Р±РѕС‡РµР№ РїР°РїРєРё Рё РёРјРµРЅРё С„Р°Р№Р»Р°
 	std::size_t found = name.find_last_of(L"/\\");
 	if(found == std::string::npos){
 		_folderPath = L"";
@@ -162,18 +162,18 @@ void CFiles::getFileList(std::wstring name){
 		currFileName = name.substr(found+1, name.length());
 	}
 
-	//обход по всем маскам
+	//РѕР±С…РѕРґ РїРѕ РІСЃРµРј РјР°СЃРєР°Рј
 	for(UINT i=0; i<masks.size(); i++){
-		//путь + маска
+		//РїСѓС‚СЊ + РјР°СЃРєР°
 		std::wstring path = _folderPath + masks[i];
 
-		//первый файл по маске
+		//РїРµСЂРІС‹Р№ С„Р°Р№Р» РїРѕ РјР°СЃРєРµ
 		HANDLE hFind = FindFirstFile(path.c_str(), &findData);
 		if(hFind == INVALID_HANDLE_VALUE)
 			continue;
 		_filesList.push_back(std::wstring(findData.cFileName));
 
-		//остальные файлы
+		//РѕСЃС‚Р°Р»СЊРЅС‹Рµ С„Р°Р№Р»С‹
 		while(FindNextFile(hFind, &findData)){
 			_filesList.push_back(std::wstring(findData.cFileName));
 		}
@@ -189,56 +189,56 @@ void CFiles::getFileList(std::wstring name){
 }
 
 bool CFiles::loadNext(){
-	//получение следующего имени файла
+	//РїРѕР»СѓС‡РµРЅРёРµ СЃР»РµРґСѓСЋС‰РµРіРѕ РёРјРµРЅРё С„Р°Р№Р»Р°
 	if(_positionInList == _filesList.size()-1) //last file
 		return false;
 	_positionInList++;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
-	//проверка существования файла
+	//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
 	if(_waccess(fullName.c_str(), 4) == -1){
 		wprintf(L">%s[%d/%d] - not found\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 		return false;
 	}
-	//отчет о работе
+	//РѕС‚С‡РµС‚ Рѕ СЂР°Р±РѕС‚Рµ
 	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
-	//загрузка bitmap
+	//Р·Р°РіСЂСѓР·РєР° bitmap
 	getBitmapData(fullName);
 	return true;
 }
 bool CFiles::loadPrev(){
-	//получение предыдущего имени файла
+	//РїРѕР»СѓС‡РµРЅРёРµ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РёРјРµРЅРё С„Р°Р№Р»Р°
 	if(_positionInList == 0) //first file
 		return false;
 	_positionInList--;
 	std::wstring fullName = _folderPath + _filesList[_positionInList];
-	//проверка существования файла
+	//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
 	if(_waccess(fullName.c_str(), 4) == -1){
 		wprintf(L">%s[%d/%d] - not found\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 		return false;
 	}
-	//отчет о работе
+	//РѕС‚С‡РµС‚ Рѕ СЂР°Р±РѕС‚Рµ
 	wprintf(L"loading...\n>%s [%d/%d]\n",fullName.c_str(), _positionInList, _filesList.size()-1);
 
-	//загрузка bitmap
+	//Р·Р°РіСЂСѓР·РєР° bitmap
 	getBitmapData(fullName);
 	return true;
 }
 
 int CFiles::loadFile(std::wstring name){
-	//проверка существования файла
+	//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
 	if(_waccess(name.c_str(), 4) == -1){
 		return 0;
 	}
 
-	//загрузка списка файлов 
+	//Р·Р°РіСЂСѓР·РєР° СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ 
 	getFileList(name);
 
-	//отчет о работе
+	//РѕС‚С‡РµС‚ Рѕ СЂР°Р±РѕС‚Рµ
 	std::wcout << L"loading..." <<std::endl;
 	std::wcout << L">" << name <<L" ["<< _positionInList <<L"/"<<_filesList.size()<<L"]"<<std::endl;
 
-	//загрузка bitmap
+	//Р·Р°РіСЂСѓР·РєР° bitmap
 	getBitmapData(name);
 
 	return 1;
@@ -247,14 +247,14 @@ int CFiles::loadFile(std::wstring name){
 
 
 int CFiles::saveFile(std::wstring name, BYTE *data, int width, int height){
-	//Инициализация GDI+
+	//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ GDI+
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 
 	
-	// Сохранение нового файла
+	// РЎРѕС…СЂР°РЅРµРЅРёРµ РЅРѕРІРѕРіРѕ С„Р°Р№Р»Р°
 	Gdiplus::Bitmap* newBit = new Gdiplus::Bitmap(width, height, width*3, PixelFormat24bppRGB, data);
 	std::cout << "sizes:";
 	std::cout << newBit->GetWidth() << " ";
@@ -264,7 +264,7 @@ int CFiles::saveFile(std::wstring name, BYTE *data, int width, int height){
 	newBit->Save(name.c_str(),&pngClsid, NULL);
 	delete newBit;
 
-	//отключение gdi+
+	//РѕС‚РєР»СЋС‡РµРЅРёРµ gdi+
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 
 	return 1;

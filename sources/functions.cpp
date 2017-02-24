@@ -1,4 +1,4 @@
-#include <windows.h>
+п»ї#include <windows.h>
 #include <gl/glut.h>
 #include <iostream>
 #include <stdio.h>
@@ -39,7 +39,7 @@ void toggleConsole(){
 
 void wndMouseMoveFunc(UINT x, UINT y){
 	if(Functions::isMouseLeftDown){
-		//сдвиг изображения относительно точки нажатия
+		//СЃРґРІРёРі РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С‚РѕС‡РєРё РЅР°Р¶Р°С‚РёСЏ
 		g_render.MoveStart(	x - mouseOrig.x, 
 							y - mouseOrig.y);
 	}
@@ -95,7 +95,7 @@ void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 			isMouseLeftDown = false;
 			g_render.MoveEnd();
 			break;
-		//перемещение изображения (up/down)
+		//РїРµСЂРµРјРµС‰РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ (up/down)
 		case WM_RBUTTONDOWN:
 			mouseOrig.x = x;
 			mouseOrig.y = y;
@@ -105,7 +105,7 @@ void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 			isMouseLeftDown = false;
 			g_render.MoveEnd();
 			break;
-		//события от колеса мыши
+		//СЃРѕР±С‹С‚РёСЏ РѕС‚ РєРѕР»РµСЃР° РјС‹С€Рё
 		case WM_MOUSEWHEEL:
 			g_render.Zoom(x,y,param);			
 			break;
@@ -144,7 +144,7 @@ void wndMouseFunc(UINT action, UINT x, UINT y, short param){
 void saveWindowSizeAndPosition();
 
 void resizeWindow(UINT w, UINT h){
-	//вычисление положения рабочей области
+	//РІС‹С‡РёСЃР»РµРЅРёРµ РїРѕР»РѕР¶РµРЅРёСЏ СЂР°Р±РѕС‡РµР№ РѕР±Р»Р°СЃС‚Рё
 	/*
 	RECT cr,wr;
 	GetClientRect(hwnd, &cr);
@@ -156,7 +156,7 @@ void resizeWindow(UINT w, UINT h){
 		h = cr.bottom;
 	*/
 
-	//расчет матриц для opengl
+	//СЂР°СЃС‡РµС‚ РјР°С‚СЂРёС† РґР»СЏ opengl
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
@@ -192,12 +192,12 @@ void saveWindowSizeAndPosition(){
 void loadWndConfig(){
 	std::wstring name = g_path + L"config.txt";
 
-	//проверка существования файла
+	//РїСЂРѕРІРµСЂРєР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ С„Р°Р№Р»Р°
 	if(_waccess(g_path.c_str(), 4) == -1){
 		return;
 	}
 
-	//загрузка
+	//Р·Р°РіСЂСѓР·РєР°
 	std::fstream fs;
 
 	std::string param;
@@ -225,30 +225,30 @@ void loadWndConfig(){
 }
 
 
-//инициализация openGl
+//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ openGl
 bool initGl(HWND hwnd, HDC *hdc){
 	HGLRC hRC;
 	GLuint PixelFormat;
-	PIXELFORMATDESCRIPTOR pfd=				// pfd Tells Windows How We Want Things To Be
+	PIXELFORMATDESCRIPTOR pfd=				
 	{
-		sizeof(PIXELFORMATDESCRIPTOR),				// Size Of This Pixel Format Descriptor
-		1,											// Version Number
-		PFD_DRAW_TO_WINDOW |						// Format Must Support Window
-		PFD_SUPPORT_OPENGL |						// Format Must Support OpenGL
-		PFD_DOUBLEBUFFER,							// Must Support Double Buffering
-		PFD_TYPE_RGBA,								// Request An RGBA Format
-		16,										// Select Our Color Depth
-		0, 0, 0, 0, 0, 0,							// Color Bits Ignored
-		0,											// No Alpha Buffer
-		0,											// Shift Bit Ignored
-		0,											// No Accumulation Buffer
-		0, 0, 0, 0,									// Accumulation Bits Ignored
-		16,											// 16Bit Z-Buffer (Depth Buffer)  
-		0,											// No Stencil Buffer
-		0,											// No Auxiliary Buffer
-		PFD_MAIN_PLANE,								// Main Drawing Layer
-		0,											// Reserved
-		0, 0, 0										// Layer Masks Ignored
+		sizeof(PIXELFORMATDESCRIPTOR),				
+		1,											
+		PFD_DRAW_TO_WINDOW |						
+		PFD_SUPPORT_OPENGL |						
+		PFD_DOUBLEBUFFER,							
+		PFD_TYPE_RGBA,								
+		16,										
+		0, 0, 0, 0, 0, 0,							
+		0,											
+		0,											
+		0,											
+		0, 0, 0, 0,									
+		16,											
+		0,										
+		0,											
+		PFD_MAIN_PLANE,								
+		0,											
+		0, 0, 0										
 	};
 
 	if (!(*hdc=GetDC(hwnd)))							

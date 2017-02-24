@@ -1,4 +1,4 @@
-#include <windows.h>
+п»ї#include <windows.h>
 #include <gl/glut.h>
 #include <iostream>
 #include <stdio.h>
@@ -44,24 +44,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//Functions::toggleConsole();
 
-	//установка глобальных переменных
+	//СѓСЃС‚Р°РЅРѕРІРєР° РіР»РѕР±Р°Р»СЊРЅС‹С… РїРµСЂРµРјРµРЅРЅС‹С…
 	initGlobals();
 
-	//получение аргументов командной строки
+	//РїРѕР»СѓС‡РµРЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РєРѕРјР°РЅРґРЅРѕР№ СЃС‚СЂРѕРєРё
 	LPTSTR line = GetCommandLine();
 	int argc;
 	LPWSTR *argv = CommandLineToArgvW(line, &argc);
 
 	if(argc == 1){
+		MessageBox(NULL, L"Use command line args", L"error", MB_OK);
 		return 1;
 	}
 
-	//получение пути до exe
+	//РїРѕР»СѓС‡РµРЅРёРµ РїСѓС‚Рё РґРѕ exe
 	g_path.assign(argv[0]);
 	int pos = g_path.find_last_of(L"/\\");
 	g_path = g_path.substr(0, pos+1);
 
-	//заполнение wnd class
+	//Р·Р°РїРѕР»РЅРµРЅРёРµ wnd class
 	WNDCLASS wc;                               
 	ZeroMemory(&wc,sizeof(wc));  
 	wc.hInstance = hInstance;         
@@ -76,19 +77,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if(!RegisterClass (&wc))
 		return 1;
 
-	//загрузка параметров
+	//Р·Р°РіСЂСѓР·РєР° РїР°СЂР°РјРµС‚СЂРѕРІ
 	Functions::loadWndConfig();
 
 
 
-	//расчет требуемого размера окна
+	//СЂР°СЃС‡РµС‚ С‚СЂРµР±СѓРµРјРѕРіРѕ СЂР°Р·РјРµСЂР° РѕРєРЅР°
 	RECT r;
 	r.left = 0; r.top = 0;
 	r.right = g_wndWidth, r.bottom = g_wndHeight;
 	//AdjustWindowRect(&r, windowStyle, false);
 	
 
-	//создание окна
+	//СЃРѕР·РґР°РЅРёРµ РѕРєРЅР°
 	HWND hwnd = CreateWindow(
 		className,
 		L"ImgViewer",
@@ -98,16 +99,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		r.bottom - r.top,
 		NULL,NULL,hInstance,NULL);
 
-	//инициализация ogl
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ ogl
 	if(!Functions::initGl(hwnd, &hdc)){
 		return 1;
 	}
 
-	//отображение окна
+	//РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РѕРєРЅР°
 	ShowWindow(hwnd, SW_SHOW);
 	UpdateWindow(hwnd);
 
-	//Загрузка первого изображения
+	//Р—Р°РіСЂСѓР·РєР° РїРµСЂРІРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 	if(!g_files.loadFile(argv[1])){
 		return 1;
 	}
@@ -138,19 +139,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam){
 	switch(message){
-		//управление
+		//СѓРїСЂР°РІР»РµРЅРёРµ
 		case WM_PAINT:	
 			break;
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			break; 
-		//клавиатура
+		//РєР»Р°РІРёР°С‚СѓСЂР°
 		case WM_KEYDOWN:
 			Functions::wndKeybFunc(wParam);
 			break;
 		case WM_KEYUP:
 			break;
-		//изменение параметров окна
+		//РёР·РјРµРЅРµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РѕРєРЅР°
 		case WM_SIZING: //sizing in progress
 			break;
 		case WM_SIZE: //sized
@@ -161,7 +162,7 @@ LRESULT CALLBACK msgWindowFunc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		case WM_MOVE:
 			//Functions::wndMoveFunc(LOWORD(lParam), HIWORD(lParam));
 			break;
-		//сообщения мыши
+		//СЃРѕРѕР±С‰РµРЅРёСЏ РјС‹С€Рё
 		case WM_LBUTTONDBLCLK:
 			Functions::wndMouseFunc(WM_LBUTTONDBLCLK,LOWORD(lParam), HIWORD(lParam), 0);
 			break;
